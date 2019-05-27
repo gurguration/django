@@ -1,0 +1,80 @@
+{% extends "shop/base.html" %}
+{% block title %}
+  თქვენი კალათა
+{% endblock %}
+{% block content %}
+  <h1>თქვენი კალათა</h1>
+  <table class="cart">
+    <thead>
+      <tr>
+        <th>გამოსახულება</th>
+        <th>პროდუქტი</th>
+        <th>რაოდენობა</th>
+        <th>კალათიდან ამოღება</th>
+        <th>ჯამი</th>
+        <th>ფასი</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart %}
+        {% with product=item.product %}
+          <tr>
+            <td>
+              <a href="{{ product.get_absolute_url }}">
+                <img src="{{ product.image.url }}" alt="" />
+              </a>
+            </td>
+            <td>{{ product.name }}</td>
+            <td><form action="{% url "cart:CartAdd" product.id %}" method="post" class="add">
+    {{ item.update_quantity_form.quantity }}
+    {{ item.update_quantity_form.update }}
+    {% csrf_token %}
+    <input type="submit" value="განახლება">
+</form></td>
+            <td><a href="{% url "cart:CartRemove" product.id %}">კალათიდან ამოღება</a></td>
+            <td class="num">{{ item.price }} ლარი.</td>
+            <td class="num">{{ item.total_price }} ლარი.</td>
+          </tr>
+        {% endwith %}
+      {% endfor %}
+              {% if cart.discount %}
+          <tr class="subtotal">
+            <td>ფასდაკლების გარეშე</td>
+            <td colspan="4"></td>
+            <td>{{ cart.get_total_price }}</td>
+          </tr>
+          <tr>
+            <td>
+               ფასდაკლება ({{ cart.discount.discount }} % )
+            </td>
+            <td colspan="4"></td>
+            <td class="num discount">- {{ cart.get_discount|floatformat:"2" }} ლარი</td>
+          </tr>
+        {% endif %}
+        <tr class="total">
+          <td>სულ</td>
+          <td colspan="4"></td>
+          <td class="num">{{ cart.get_total_price_after_discount|floatformat:"2" }} ლარი</td>
+        </tr>
+    </tbody>
+  </table>
+<br><br>
+  <p>ფასდაკლების გააქტიურება</p>
+
+  <form action="{% url "coupons:apply" %}" method="post" class="add">
+    {% csrf_token %}
+    {{ discount_apply_form }}
+    <input type="submit" value="განახლება">
+  </form>
+        <tr class="total">
+          <td>ჯამი</td>
+          <td colspan="4"></td>
+          <td class="num">{{ cart.get_total_price }} ლარი</td>
+        </tr>
+    </tbody>
+  </table>
+  <p class="text-right">
+    <a href="{% url "shop:ProductList"%}" class="btn">შოპინგის გაგრძელება</a>
+<a href="{% url "orders:OrderCreate" %}" class="btn">შეკვეთის მიცემა</a>
+  </p>
+{% endblock %}

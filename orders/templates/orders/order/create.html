@@ -1,0 +1,37 @@
+{% extends "shop/base.html" %}
+
+{% block title %}
+  შეკვეთის მიცემა
+{% endblock %}
+
+{% block content %}
+  <h1>შეკვეთა</h1>
+  <div class="col-sm-4">
+    <h2>დაასრულეთ შეკვეთა</h2>
+    <form class="order-form" action="." method="post">
+      {{ form.as_p }}
+      {% csrf_token %}
+      <input type="submit" value="გაგზავნა">
+    </form>
+  </div>
+
+  <div class="order-info col-sm-8">
+    <h2>თქვენი შეკვეთა</h2>
+    <ul>
+      {% for item in cart  %}
+        <li>
+          {{ item.product.name }} | რაოდენობა: {{ item.quantity }} | ფასი: {{ item.total_price }}
+        </li>
+      {% endfor %}
+
+     {% if cart.discount %}
+        <li>
+           ({{ cart.discount.discount }}%-ით ნაკლები)
+          <span> - {{ cart.get_discount|floatformat:"2"}} ლარი</span>
+        </li>
+      {% endif %}
+    </ul>
+    <p><strong>სულ:</strong> {{ cart.get_total_price_after_discount|floatformat:"2"}} ლარი</p>
+    </ul>
+  </div>
+{% endblock %}
